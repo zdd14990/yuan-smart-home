@@ -1,0 +1,1376 @@
+/* ==========================================================================
+   隅安 YUAN — Progressive Psychological Horror Stylesheet
+   Act I: Warm Editorial Minimalism (Apple Home / MUJI / Dyson aesthetic)
+   Act II: Fluorescent Uncanny Drift
+   Act III: Architectural Surveillance & Structural Decay
+   Act IV: 35mm / Infrared Night-Vision Horror Cinema
+   ========================================================================== */
+
+:root {
+  /* Scroll-driven dynamic variables updated by app.js */
+  --scroll-p: 0;
+  --unease: 0;       /* 0 -> 1 across 20% - 55% */
+  --dread: 0;        /* 0 -> 1 across 50% - 75% */
+  --terror: 0;       /* 0 -> 1 across 72% - 100% */
+  --skew-jitter: 0deg;
+  --chroma-offset: 0px;
+
+  /* Base Daylight Palette (Act I) */
+  --bg-page: #faf8f4;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f2efe9;
+  --text-primary: #171918;
+  --text-secondary: #575c59;
+  --text-muted: #878d89;
+  --accent: #295643;
+  --accent-soft: rgba(41, 86, 67, 0.1);
+  --border-color: rgba(23, 25, 24, 0.09);
+  --shadow-soft: 0 20px 50px rgba(20, 24, 21, 0.06);
+
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  --font-serif: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  background-color: #040505;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.18s linear, color 0.18s linear;
+}
+
+img,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.container {
+  width: min(1180px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+/* ==========================================================================
+   Global Atmospheric Overlays
+   ========================================================================== */
+
+#ambient-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  opacity: 0;
+  background: radial-gradient(
+    circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+    transparent 28%,
+    rgba(4, 7, 6, 0.55) 72%,
+    rgba(2, 3, 3, 0.94) 100%
+  );
+  transition: opacity 0.2s linear;
+}
+
+#scanline-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 81;
+  opacity: 0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0) 2px,
+      rgba(0, 0, 0, 0.22) 3px,
+      rgba(0, 0, 0, 0.22) 4px
+    );
+  mix-blend-mode: multiply;
+}
+
+#chromatic-pulse {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 82;
+  opacity: 0;
+  box-shadow: inset 0 0 110px rgba(130, 12, 18, 0.45);
+}
+
+#subliminal-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  pointer-events: none;
+  opacity: 0;
+  background: #020303;
+  display: grid;
+  place-items: center;
+}
+
+#subliminal-flash.is-active {
+  opacity: 0.92;
+}
+
+#subliminal-flash img {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  filter: contrast(1.55) saturate(0.2) brightness(0.78);
+  transform: scale(1.08);
+}
+
+#scroll-lock-toast {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  z-index: 150;
+  background: rgba(8, 10, 10, 0.94);
+  border: 1px solid rgba(196, 43, 43, 0.55);
+  color: #e7dede;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 10px 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75);
+}
+
+#scroll-lock-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.lock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d93838;
+  box-shadow: 0 0 10px #d93838;
+  animation: pulseFast 0.6s infinite alternate;
+}
+
+/* ==========================================================================
+   Navigation Header
+   ========================================================================== */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 110;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(250, 248, 244, 0.82);
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.25s ease, border-color 0.25s ease, opacity 0.3s ease;
+}
+
+body.is-deep-horror .site-header {
+  background: rgba(5, 7, 7, 0.72);
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+.header-inner {
+  width: min(1180px, calc(100% - 48px));
+  height: 68px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: conic-gradient(from 140deg, #295643, #588973, #295643);
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  transition: background 0.4s ease, transform 0.4s ease;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: #faf8f4;
+  transition: all 0.4s ease;
+}
+
+body.is-contaminated .brand-mark,
+body.is-deep-horror .brand-mark {
+  background: radial-gradient(circle, #9e1c1c 10%, #140505 80%);
+}
+
+body.is-contaminated .brand-mark::after,
+body.is-deep-horror .brand-mark::after {
+  inset: 11px 13px;
+  border-radius: 40%;
+  background: #e8dada;
+}
+
+.brand-text-wrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+}
+
+.brand-sub {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+body.is-deep-horror .brand-name,
+body.is-deep-horror .nav-link {
+  color: rgba(226, 232, 229, 0.78);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   Buttons & Pills
+   ========================================================================== */
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.18s ease, background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-sm {
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 15px;
+}
+
+.btn-full {
+  width: 100%;
+  padding: 13px 22px;
+  font-size: 15px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(41, 86, 67, 0.2);
+}
+
+.btn-primary:hover {
+  background: #204636;
+}
+
+body.is-deep-horror .btn-primary,
+body.is-contaminated .btn-primary {
+  background: #5b1418;
+  box-shadow: 0 8px 24px rgba(120, 14, 20, 0.35);
+}
+
+.btn-secondary {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: #e7e3da;
+}
+
+.btn-ghost-pill {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost-pill[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+body.is-deep-horror .btn-ghost-pill {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #cfd6d3;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sound-wave-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.65;
+}
+
+.btn-ghost-pill[aria-pressed="true"] .sound-wave-icon {
+  opacity: 1;
+  animation: pulseFast 0.9s infinite alternate;
+}
+
+.btn-reset {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(215, 70, 70, 0.45);
+  color: #d87a7a;
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-reset:hover {
+  background: rgba(215, 70, 70, 0.16);
+}
+
+/* ==========================================================================
+   ACT I: Hero Section
+   ========================================================================== */
+
+.hero-section {
+  padding-top: 132px;
+  padding-bottom: 84px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.02fr 1.08fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.eyebrow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+
+body.is-contaminated .eyebrow-badge {
+  background: rgba(138, 24, 28, 0.14);
+  color: #9e262b;
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.hero-title {
+  font-size: clamp(36px, 4.4vw, 56px);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  margin: 0 0 22px;
+  font-weight: 700;
+}
+
+body.is-contaminated .hero-title {
+  font-family: var(--font-serif);
+  letter-spacing: 0.02em;
+}
+
+.hero-desc {
+  font-size: 17px;
+  color: var(--text-secondary);
+  margin: 0 0 32px;
+  max-width: 520px;
+}
+
+.hero-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.play-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.hero-micro-note {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.hero-visual-card {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10.5;
+  background: #e8e4dc;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-color);
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.7s ease, transform 1.2s ease, filter 0.6s ease;
+}
+
+.hero-img-haunted {
+  opacity: 0;
+}
+
+body.is-contaminated .hero-img-haunted {
+  opacity: 1;
+}
+
+body.is-contaminated .hero-img-day {
+  opacity: 0;
+}
+
+.telemetry-float {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  width: 284px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 14px 34px rgba(15, 20, 18, 0.12);
+}
+
+body.is-contaminated .telemetry-float {
+  background: rgba(12, 15, 15, 0.86);
+  border-color: rgba(190, 45, 45, 0.38);
+  color: #e2dddd;
+}
+
+.telemetry-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.status-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2f9e66;
+  box-shadow: 0 0 8px rgba(47, 158, 102, 0.6);
+}
+
+body.is-contaminated .status-live-dot {
+  background: #cf3030;
+  box-shadow: 0 0 10px rgba(207, 48, 48, 0.8);
+}
+
+#breath-wave-canvas {
+  width: 100%;
+  height: 46px;
+  margin-bottom: 6px;
+}
+
+.telemetry-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+body.is-contaminated .telemetry-meta {
+  color: #b7aaaa;
+}
+
+/* Trust Ribbon */
+.trust-ribbon {
+  margin-top: 64px;
+  padding: 28px 36px;
+  border-radius: 22px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(20, 24, 21, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.trust-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trust-num {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.trust-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.trust-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border-color);
+}
+
+/* ==========================================================================
+   ACT II: Bento Features Section (Subtle Uncanny Slippage)
+   ========================================================================== */
+
+.features-section {
+  padding: 110px 0;
+}
+
+.section-header {
+  max-width: 680px;
+  margin-bottom: 54px;
+}
+
+.section-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: clamp(28px, 3.3vw, 42px);
+  line-height: 1.2;
+  margin: 0 0 16px;
+  letter-spacing: -0.015em;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.bento-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 12px 32px rgba(18, 22, 20, 0.03);
+  transform: rotate(var(--skew-jitter));
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.bento-wide {
+  grid-column: span 2;
+}
+
+.bento-icon {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  width: 36px;
+  height: 26px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 22px;
+  font-weight: 600;
+}
+
+.bento-title {
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+
+.bento-body {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 0 0 22px;
+  line-height: 1.75;
+}
+
+.bento-footnote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Occupant Live Telemetry Widget inside Card 3 */
+.occupant-widget {
+  background: var(--bg-subtle);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 12.5px;
+}
+
+.occupant-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.occ-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.occ-green {
+  background: #2f9e66;
+}
+
+.occ-red {
+  background: #c93030;
+  box-shadow: 0 0 8px rgba(201, 48, 48, 0.75);
+  animation: pulseFast 0.75s infinite alternate;
+}
+
+.occ-name {
+  font-weight: 600;
+  flex: 1;
+}
+
+.occ-state {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.occupant-anomaly {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.65s ease, max-height 0.65s ease;
+}
+
+.occupant-anomaly.is-revealed {
+  opacity: 1;
+  max-height: 44px;
+}
+
+.occupant-anomaly .occ-name,
+.occupant-anomaly .occ-state {
+  color: #9e2424;
+}
+
+/* ==========================================================================
+   ACT II.5: Testimonials (Uncanny Valley Escalation)
+   ========================================================================== */
+
+.testimonials-section {
+  padding: 110px 0;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.review-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.review-stars {
+  color: #c8943e;
+  letter-spacing: 3px;
+  font-size: 14px;
+}
+
+.review-quote {
+  margin: 0;
+  font-size: 14.8px;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.avatar-stack {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #232726;
+}
+
+.avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-uncanny {
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 0.25s linear, transform 0.4s ease;
+}
+
+.avatar-desat {
+  filter: saturate(calc(1 - var(--unease) * 0.85)) contrast(calc(1 + var(--unease) * 0.35));
+}
+
+.author-name {
+  font-weight: 700;
+  font-size: 14.5px;
+}
+
+.author-role {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.review-card-live {
+  border-color: rgba(180, 42, 42, 0.28);
+  position: relative;
+}
+
+.review-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #b33232;
+}
+
+.live-red-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #cc2929;
+  animation: pulseFast 0.8s infinite alternate;
+}
+
+.avatar-placeholder {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%, #1d2221 0%, #060707 78%);
+  border: 1px solid rgba(205, 55, 55, 0.4);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.mirror-pupil {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #e8eded 0%, #862020 55%, transparent 72%);
+  transform: translate(var(--eye-x, 0px), var(--eye-y, 0px));
+}
+
+/* ==========================================================================
+   ACT III: Floorplan Radar & Corrupted Specs (54% - 72%)
+   ========================================================================== */
+
+.surveillance-section {
+  padding: 120px 0 60px;
+  color: #dce2df;
+}
+
+.surveillance-grid {
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  gap: 36px;
+  align-items: stretch;
+}
+
+.radar-panel {
+  background: #0b0e0e;
+  border: 1px solid rgba(162, 189, 176, 0.18);
+  border-radius: 22px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55);
+}
+
+.panel-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #8ca398;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.panel-lock {
+  color: #df5454;
+}
+
+.radar-canvas-wrap {
+  margin: 16px 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #060808;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#radar-canvas {
+  width: 100%;
+  height: auto;
+}
+
+.radar-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.radar-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-k {
+  font-size: 11.5px;
+  color: #7d8a84;
+}
+
+.stat-v {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: #eef3f0;
+}
+
+.stat-warn {
+  font-size: 13px;
+  color: #e05a5a;
+}
+
+.specs-panel {
+  background: rgba(14, 18, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  padding: 34px;
+  color: #dbe2df;
+}
+
+.specs-panel .section-kicker {
+  color: #c94a4a;
+}
+
+.specs-heading {
+  font-size: 28px;
+  margin: 0 0 26px;
+  color: #f2f5f4;
+}
+
+.specs-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.spec-row {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.spec-row dt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #889891;
+  margin-bottom: 5px;
+}
+
+.spec-row dd {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: #dfe6e3;
+}
+
+.spec-row-critical {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.spec-row-critical dt,
+.spec-row-critical dd {
+  color: #e66767;
+}
+
+/* Transitional Descent Gate */
+.descent-gate {
+  margin-top: 150px;
+  margin-bottom: 90px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.gate-line {
+  margin: 0;
+  font-family: var(--font-serif);
+  letter-spacing: 0.08em;
+}
+
+.gate-line-1 {
+  font-size: 15px;
+  color: #7d8682;
+}
+
+.gate-line-2 {
+  font-size: clamp(20px, 2.5vw, 30px);
+  color: #d7dfdc;
+}
+
+.gate-line-2 strong {
+  color: #de4848;
+  font-weight: 600;
+}
+
+.gate-line-3 {
+  font-size: 15px;
+  color: #9e4242;
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   ACT IV: Full-Bleed Pinned Horror Movie Sequence (72% - 100%)
+   ========================================================================== */
+
+.horror-cinema-track {
+  position: relative;
+  height: 470vh;
+  background: #020303;
+}
+
+.horror-sticky-stage {
+  position: sticky;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #020303;
+  cursor: crosshair;
+}
+
+#horror-cinema-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cctv-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  padding: 90px 38px 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cctv-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  color: rgba(196, 214, 203, 0.78);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+}
+
+.cctv-rec {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.rec-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d82c2c;
+  box-shadow: 0 0 12px #d82c2c;
+  animation: pulseFast 0.7s infinite alternate;
+}
+
+.cctv-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cctv-sep {
+  opacity: 0.35;
+}
+
+.blackout-whisper {
+  align-self: center;
+  text-align: center;
+  margin-block: auto;
+  animation: subtleTremor 0.18s infinite;
+}
+
+.whisper-small {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: rgba(185, 72, 72, 0.78);
+  margin-bottom: 14px;
+}
+
+.whisper-main {
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 3vw, 34px);
+  letter-spacing: 0.14em;
+  color: #ded8d8;
+  text-shadow: 0 0 24px rgba(180, 20, 20, 0.45);
+}
+
+.cinema-subtitle-wrap {
+  text-align: center;
+  min-height: 42px;
+  margin-top: auto;
+}
+
+.cinema-subtitle {
+  display: inline-block;
+  margin: 0;
+  padding: 6px 16px;
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 1.9vw, 23px);
+  letter-spacing: 0.08em;
+  color: #ece9df;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.98),
+    0 0 18px rgba(0, 0, 0, 0.92);
+}
+
+/* Climax Final Overlay (>= 96.2%) */
+.climax-final-overlay {
+  position: absolute;
+  inset: auto 0 46px 0;
+  display: flex;
+  justify-content: center;
+  padding-inline: 24px;
+}
+
+.climax-box {
+  background: rgba(5, 4, 5, 0.82);
+  border: 1px solid rgba(206, 40, 40, 0.58);
+  backdrop-filter: blur(8px);
+  padding: 20px 30px;
+  border-radius: 14px;
+  text-align: center;
+  max-width: 560px;
+  box-shadow: 0 0 60px rgba(155, 12, 18, 0.42);
+}
+
+.climax-tag {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  color: #dc4c4c;
+  margin-bottom: 8px;
+}
+
+.climax-dist {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: #cfc6c6;
+  margin-bottom: 10px;
+}
+
+.climax-dist strong {
+  color: #ff4747;
+  font-size: 17px;
+}
+
+.climax-line {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(18px, 2.1vw, 24px);
+  letter-spacing: 0.08em;
+  color: #f5efef;
+}
+
+/* ==========================================================================
+   Modal Dialog (Act I Booking)
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(12, 16, 15, 0.56);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.modal-panel {
+  position: relative;
+  width: min(460px, 100%);
+  background: #ffffff;
+  color: #171918;
+  border-radius: 24px;
+  padding: 34px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #f2efe9;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.modal-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: #295643;
+  margin-bottom: 8px;
+}
+
+.modal-panel h3 {
+  margin: 0 0 10px;
+  font-size: 23px;
+}
+
+.modal-panel p {
+  margin: 0 0 22px;
+  font-size: 14px;
+  color: #575c59;
+}
+
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field-label input,
+.field-label select {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(23, 25, 24, 0.16);
+  background: #faf8f4;
+}
+
+.booking-result {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #141717;
+  color: #e4dede;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  border-left: 3px solid #cc3535;
+}
+
+/* ==========================================================================
+   Animations & Responsive
+   ========================================================================== */
+
+@keyframes pulseFast {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+@keyframes subtleTremor {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 0.5px); }
+  50% { transform: translate(1px, -0.5px); }
+  75% { transform: translate(-0.5px, -1px); }
+  100% { transform: translate(0.5px, 1px); }
+}
+
+@media (max-width: 960px) {
+  .main-nav {
+    display: none;
+  }
+
+  .hero-grid,
+  .surveillance-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-grid,
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-wide {
+    grid-column: span 1;
+  }
+
+  .trust-ribbon {
+    flex-wrap: wrap;
+  }
+
+  .trust-divider {
+    display: none;
+  }
+}
